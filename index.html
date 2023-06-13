@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>スロットアプリ</title>
+    <style>
+        .slot {
+            float: left;
+            width: 150px;
+            text-align: center;
+            font-size: 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>スロットアプリ</h1>
+    <p>現在の得点：<span id="score">0</span></p>
+    <div class="slot">
+        <div id="slot0">0</div>
+        <input type="button" value="STOP" id="stop0">
+    </div>
+    <div class="slot">
+        <div id="slot1">0</div>
+        <input type="button" value="STOP" id="stop1">
+    </div>
+
+    <script>  
+        var timers = [];
+        var results = [];
+        var stopCount = 0;
+        var score = 0;
+        interval = 400;
+
+        //イベント登録
+        document.getElementById("stop0").onclick
+            = function () {
+                stopSlot(0);
+            }
+        document.getElementById("stop1").onclick
+            = function () {
+                stopSlot(1);
+            }
+
+        //スロット開始
+        startSlot();
+
+        function startSlot() {
+            stopCount = 0;
+            timers = [];
+            results = [];
+            
+            //タイマー有効処理
+            runSlot(0);
+            runSlot(1);
+        }
+
+        function runSlot(num) {
+            var slotValue = document.getElementById("slot" + num);
+
+            if (slotValue.innerHTML < 9) {
+                slotValue.innerHTML++;
+            } else {
+                slotValue.innerHTML = 0;
+            }
+
+            timers[num] = setTimeout(function () {
+                runSlot(num);
+            }, interval);
+        }
+
+        function stopSlot(num) {
+            //タイマーストップ
+            clearTimeout(timers[num]);
+            results[num] = document.getElementById('slot' +
+                num).innerHTML;
+
+            stopCount++;
+
+            if (stopCount == 2) {
+                checkResult();
+            }
+        }
+
+        //結果取得
+        function checkResult() {
+            //判定処理
+            if (results[0] == results[1]) {
+                alert("揃ったゾイ");
+                interval *= 0.8;
+                score += 1000 / interval;
+                updateScore();
+                startSlot();
+            } else {
+                gameover();
+            }
+        }
+
+        function updateScore() {
+            target = document.getElementById("score");
+            target.innerHTML = score;
+        }
+
+        function gameover() {
+            alert("ダメだったゾイ");
+            getTweetBtn();
+        }
+
+        function getTweetBtn() {
+            var tweetBtn = document.createElement("p");
+            tweetBtn.innerHTML = '<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a>'
+            
+            var h1 = document.getElementsByTagName('h1')[0];
+            document.body.insertBefore(tweetBtn, h1);
+        }
+    </script>
+</body>
+
+</html>
